@@ -46,10 +46,10 @@ test("real packages parse", { skip: !need("fm1-015.fwsc") && "no test data" }, (
   }
 });
 
-// Against what M-Flasher itself said about the same dumps, kept beside them as .json.
+// Against what M-Flasher + itself said about the same dumps, kept beside them as .json.
 const dumps = process.env.FLASHER_DUMPS ? JSON.parse(readFileSync(process.env.FLASHER_DUMPS, "utf8")) : [];
 for (const d of dumps) {
-  test(`analysis agrees with M-Flasher on ${d.file}`, () => {
+  test(`analysis agrees with M-Flasher + on ${d.file}`, () => {
     const flash = new Uint8Array(readFileSync(d.file));
     assert.equal(createHash("sha256").update(flash).digest("hex"), d.sha256);
     const a = analyse(flash, d.flash, CHIP_KEY);

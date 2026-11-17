@@ -5,10 +5,10 @@ import { FINISH, Link, Unit, UnitLost, findPorts } from "./lib/protocol.js";
 import { analyse, describePlan, flashTested, flashText, planFirmware, planRestore } from "./lib/unit.js";
 import { loadManifest, loadPackage, hasOwnUpdater, variantOf } from "./lib/assets.js";
 
-const TOOL = "m-flasher web 0.1";
+const TOOL = "m-flasher-plus web 0.1";
 /** Firmware whose update route has run the helper on real hardware. */
 const ROUTE_TESTED = new Set(["FM-1_015", "FM-1_016", "FM-1_102", "FM-1_918", "FM-1_900", "FM-1_920", "FM-1_91061", "SMK-37 Pro_016", "SMK-37+VA_102", "SMK-37 Pro_920", "SMK-37 Elite_016"]);
-const OTHER_WAYS = "With m-bootloader installed, hold PLAY (SEQ PLAY on the SMK-37) at power-on and choose MIDI MODE. Otherwise, use M-Flasher on a computer.";
+const OTHER_WAYS = "With m-bootloader installed, hold PLAY (SEQ PLAY on the SMK-37) at power-on and choose MIDI MODE. Otherwise, use M-Flasher + on a computer.";
 const $ = (id) => document.getElementById(id);
 
 const state = {
@@ -313,7 +313,7 @@ async function installBootloader() {
   const manifest = await loadManifest();
   const ok = await confirmWrite({
     title: `Install m-bootloader ${manifest.bootloaderVersion}`,
-    text: "Installs the open bootloader, through the firmware's update route. Only the boot area changes. It adds hold-REC download mode, a recovery menu and MIDI mode. The firmware stays, and M-Flasher on a computer can put the stock bootloader back.",
+    text: "Installs the open bootloader, through the firmware's update route. Only the boot area changes. It adds hold-REC download mode, a recovery menu and MIDI mode. The firmware stays, and M-Flasher + on a computer can put the stock bootloader back.",
     warnings: [
       state.backupSaved ? null : "You haven't saved a backup in this session. Start the tools first to make one.",
       "An interrupted boot-area write can leave a unit needing a USB_KEY dongle: don't unplug it during this.",
@@ -348,7 +348,7 @@ async function applyPlan(plan) {
     return;
   }
   const warnings = [...plan.warnings];
-  if (state.info.kind === "stage" && state.analysis.bootloaderKind !== "open") warnings.push("This unit has the stock bootloader, so it has no hold-REC or MIDI mode. If this write is interrupted, it may need M-Flasher in download mode or a USB_KEY dongle.");
+  if (state.info.kind === "stage" && state.analysis.bootloaderKind !== "open") warnings.push("This unit has the stock bootloader, so it has no hold-REC or MIDI mode. If this write is interrupted, it may need M-Flasher + in download mode or a USB_KEY dongle.");
   const ok = await confirmWrite({
     title: plan.title,
     text: `${describePlan(plan)}\n\n${state.backupSaved ? "A backup of this unit was saved in this session." : "Your backup is saved to your downloads first."}\nThe unit checks everything it receives before it erases anything.`,
@@ -482,7 +482,7 @@ function render() {
   const notes = [];
   if (hasOwnUpdater(state.identity)) {
     fact(facts, "Running", `${state.mode === "loader" ? "its updater" : "firmware"} ${state.identity}`);
-    notes.push("This firmware only updates from its own kind of package, so this page can't start the tools on it. Your firmware is unchanged. Use M-Flasher on a computer, or m-bootloader 2.2's MIDI MODE (hold SEQ PLAY at power-on).");
+    notes.push("This firmware only updates from its own kind of package, so this page can't start the tools on it. Your firmware is unchanged. Use M-Flasher + on a computer, or m-bootloader 2.2's MIDI MODE (hold SEQ PLAY at power-on).");
     if (state.mode === "loader") notes.push("It's in its updater now. To leave, switch it off and on.");
   } else if (state.mode === "firmware") {
     fact(facts, "Running", `firmware ${state.identity}`);
@@ -512,22 +512,22 @@ function render() {
   }));
   const list = [];
   if (hasOwnUpdater(state.identity)) {
-    list.push(action("Switch to download mode", "For M-Flasher on a computer. A browser can't use this mode.", () => leave("downloadMode", "Asked for download mode. Open M-Flasher on a computer.")));
+    list.push(action("Switch to download mode", "For M-Flasher + on a computer. A browser can't use this mode.", () => leave("downloadMode", "Asked for download mode. Open M-Flasher + on a computer.")));
   } else if (state.mode === "firmware") {
     list.push(action("Start the tools", "Back up, restore, or install firmware. Your firmware stays, and the unit goes back to it afterwards.", startTools));
     list.push(action("Install m-bootloader", "Adds hold-REC download mode, a recovery menu, and MIDI mode for when firmware won't start.", installBootloader, "quiet"));
-    list.push(action("Switch to download mode", "For M-Flasher on a computer. A browser can't use this mode.", () => leave("downloadMode", "Asked for download mode. Open M-Flasher on a computer."), "quiet"));
+    list.push(action("Switch to download mode", "For M-Flasher + on a computer. A browser can't use this mode.", () => leave("downloadMode", "Asked for download mode. Open M-Flasher + on a computer."), "quiet"));
   } else if (state.mode === "loader") {
     list.push(action("Install firmware…", "From an .fwsc package.", installFirmware));
-    list.push(action("Switch to download mode", "For M-Flasher on a computer.", () => leave("downloadMode", "Asked for download mode. Open M-Flasher on a computer."), "quiet"));
+    list.push(action("Switch to download mode", "For M-Flasher + on a computer.", () => leave("downloadMode", "Asked for download mode. Open M-Flasher + on a computer."), "quiet"));
   } else if (state.flash) {
-    list.push(action("Save a backup", "The whole flash, as read, in M-Flasher's format.", saveBackup));
+    list.push(action("Save a backup", "The whole flash, as read, in M-Flasher +'s format.", saveBackup));
     if (state.analysis.board) {
       list.push(action("Restore a backup…", "Firmware, settings and presets from a backup of this unit. Checks everything before erasing anything.", restoreBackup, "quiet"));
       list.push(action("Install firmware…", "From an .fwsc package for this model.", installFirmware, "quiet"));
     }
     list.push(action("Restart", "Leaves this mode, and starts the firmware.", () => leave("restart", "Restarting."), "quiet"));
-    list.push(action("Switch to download mode", "For M-Flasher on a computer.", () => leave("downloadMode", "Asked for download mode. Open M-Flasher on a computer."), "quiet"));
+    list.push(action("Switch to download mode", "For M-Flasher + on a computer.", () => leave("downloadMode", "Asked for download mode. Open M-Flasher + on a computer."), "quiet"));
   }
   $("action-list").replaceChildren(...list);
   document.body.dataset.mode = state.mode;
