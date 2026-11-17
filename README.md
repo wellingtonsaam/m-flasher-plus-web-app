@@ -1,4 +1,4 @@
-# M-Flasher for the web
+# M-Flasher + for the web
 
 An experimental beta: a static page that does what can be done from a browser, over USB MIDI: back up a unit, restore a backup, install firmware, and install m-bootloader. It needs a browser with Web MIDI, served over HTTPS or from `localhost`, and nothing else: no build step, no server, and nothing leaves the device.
 
@@ -22,7 +22,7 @@ Both answer the commands in [m-bootloader's specification](https://github.com/jv
 
 - Write the boot area or the key area from a backup, or the SMK-37's Bluetooth and calibration sectors. MIDI mode can't. m-bootloader is installed only through its own package, on firmware that accepts it.
 - Send firmware's other service commands. On stock SMK-37 firmware, command `0x21` erases a sector with no protection, and the checksum doesn't cover the command byte. `lib/protocol.js` can only send what's in its `ALLOWED` list, and packages.
-- Help a stock unit that won't start. That needs M-Flasher on a computer, or the USB_KEY dongle.
+- Help a stock unit that won't start. That needs the M-Flasher + app on a computer, or the USB_KEY dongle.
 
 ## Tested
 
