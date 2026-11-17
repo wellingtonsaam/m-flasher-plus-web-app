@@ -122,3 +122,13 @@ test("findPorts takes units only, the first port first", () => {
   };
   assert.deepEqual(findPorts(access).map((p) => p.name), ["SMK-37 Pro", "MIDIOUT2 (SMK-37 Pro)"]);
 });
+
+test("units are found under their firmware's port names, as in src/midi.rs", async () => {
+  const { findPorts } = await import("../lib/protocol.js");
+  const port = (name) => ({ name, state: "connected" });
+  const access = (names) => ({ inputs: new Map(names.map((n, i) => [i, port(n)])), outputs: new Map(names.map((n, i) => [i, port(n)])) });
+  for (const name of ["Caravel", "FM-1", "Hügelton Instruments Hortator", "Hügelton Instruments Jangada", "Hugelton Instruments Jangada"]) {
+    assert.equal(findPorts(access([name])).length, 1, name);
+  }
+  assert.equal(findPorts(access(["IAC Driver Bus 1", "Portable SSD"])).length, 0);
+});

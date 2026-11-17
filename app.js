@@ -53,9 +53,11 @@ function log(text) {
 }
 
 function status(text, kind = "") {
+  // Rescans repeat the same message: the log gets it once.
+  const same = text === $("status").textContent;
   $("status").textContent = text;
   $("status").className = `status ${kind}`;
-  if (text) log(text);
+  if (text && !same) log(text);
 }
 
 /** A finished install's message, which stays when the unit restarts and reappears. */
