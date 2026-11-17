@@ -114,7 +114,7 @@ async function scan() {
   select.replaceChildren(...ports.map((p, i) => new Option(p.name, i)));
   $("port-row").hidden = ports.length < 2;
   if (!ports.length) {
-    if (!finished()) status("No unit found. Is it on, and plugged in with a data cable?");
+    if (!finished()) status("No unit found on USB MIDI.");
     render();
     return;
   }
@@ -569,7 +569,7 @@ function lcdContent() {
   const name = unitName();
   if (state.mode === "none") {
     return state.access
-      ? { title: "No unit", status: "Not found on USB MIDI", detail: "Data cable? Switched on?", prompt: `Press ${CHECK}` }
+      ? { state: "alert", title: "Not found", status: "Not on USB MIDI", detail: "Hold PLAY at power-on", prompt: `MIDI MODE, then ${CHECK}` }
       : { title: "No unit", status: "Waiting for USB MIDI", detail: "Plug it in, switch it on", prompt: `Press ${CHECK}` };
   }
   if (hasOwnUpdater(state.identity)) {
@@ -622,6 +622,7 @@ function renderNotice() {
   let notice = null;
   const a = state.analysis;
   if (!state.supported) notice = ["MIDI Browser", "Safari doesn't support Web MIDI, so it can't reach the unit. Download the MIDI Browser app and open this page there: it installs m-bootloader and firmware without problems. On a computer or Android, Chrome, Edge, Brave and Firefox work too."];
+  else if (state.mode === "none" && state.access) notice = ["Not found", `Switch the FM-1 off. Hold PLAY (SEQ PLAY on the SMK-37) while switching it on, choose MIDI MODE in the menu, then press ${CHECK}. That needs m-bootloader. Without it, switch the unit on normally, so its firmware shows up on USB MIDI. If the M-Flasher + app just checked it, it's still in download mode, which a browser can't see: switch it off and on first. Use a USB data cable, and close other MIDI apps.`];
   else if (state.mode === "none") notice = ["Beta", "Experimental: save a backup first, and keep the M-Flasher + app at hand"];
   else if (hasOwnUpdater(state.identity)) notice = ["Other ways", `This firmware only updates from its own kind of package, so the browser can't read it. Your firmware is unchanged. Use the M-Flasher + app on a computer, or m-bootloader 2.2's MIDI MODE (hold SEQ PLAY at power-on).${state.mode === "loader" ? " It's in its updater now: to leave, switch it off and on." : ""}`];
   else if (state.mode === "firmware") notice = ["Firmware route", `A browser can't read the flash through firmware: ${CHECK} starts the tools, which run from RAM. Your firmware stays.`];
