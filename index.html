@@ -2,83 +2,141 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>M-Flasher + for the web</title>
 <meta name="description" content="Back up, restore and install firmware on an M-VAVE FM-1 or SMK-37 from your browser, over USB MIDI.">
+<meta name="theme-color" content="#28221f">
 <link rel="icon" href="assets/icon-256.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono&family=Saira:ital,wght@1,900&family=Share+Tech+Mono&family=VT323&display=swap">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header>
-  <h1>M-Flasher + <span>for the web</span></h1>
-  <p>Back up, restore and install firmware on an M-VAVE FM-1 or SMK-37, over USB MIDI, from a computer or a phone. Nothing leaves your device.</p>
+<header class="top">
+  <h1 class="wordmark">M-Flasher +</h1>
+  <p class="subtitle"><span>USB MIDI firmware utility</span><span>in the browser · experimental beta</span></p>
+  <p class="unit-line" id="unit-line"><span id="unit-line-text">No unit</span><i class="led" id="unit-led"></i></p>
+  <nav class="tabs" aria-label="Sections">
+    <button type="button" class="tab active" aria-current="page">Device</button>
+    <button type="button" class="tab" id="about-tab">About</button>
+  </nav>
+  <span class="version">web beta</span>
 </header>
-<main>
-  <section id="test-notice">
-    <h2>Experimental beta</h2>
-    <p>This page is an experimental beta, and has had far less testing than the M-Flasher + app on a computer. Save a backup first, and keep the M-Flasher + app at hand.</p>
-  </section>
-  <section id="unsupported" hidden>
-    <h2>This browser can't reach MIDI devices</h2>
-    <p>Safari doesn't support Web MIDI, so it can't reach the unit. Download the MIDI Browser app and open this page there: it installs m-bootloader and firmware without problems. On a computer or Android, Chrome, Edge, Brave and Firefox work too.</p>
-  </section>
 
-  <section id="connect">
-    <h2>Connect the unit</h2>
-    <p id="hint">Plug it in directly with a USB data cable, and switch it on. Close M-UPGRADE, other editors and music apps first.</p>
-    <button id="connect-button" type="button">Check FM-1 status</button>
-    <label id="port-row" hidden>Port <select id="port-select"></select></label>
-  </section>
+<main class="body">
+  <div class="col col-left">
+    <h2 class="section-label">Connected device</h2>
+    <div class="lcd" id="lcd" data-state="ready" aria-live="polite">
+      <div class="screen">
+        <p class="lcd-title" id="lcd-title">No unit</p>
+        <p class="lcd-line" id="lcd-status"></p>
+        <p class="lcd-line" id="lcd-detail"></p>
+        <div class="lcd-bar" id="lcd-bar" hidden><i id="lcd-bar-fill"></i></div>
+        <hr>
+        <p class="lcd-line" id="lcd-prompt"></p>
+      </div>
+    </div>
 
-  <section id="unit" hidden>
-    <h2>This unit</h2>
-    <dl id="unit-facts"></dl>
-    <ul id="unit-notes"></ul>
-  </section>
+    <div class="foot">
+      <button type="button" class="op" id="check-button" data-icon="bootloader"><span class="label">Check FM-1 status</span><i class="led"></i></button>
+      <button type="button" class="op" id="bootloader-button" data-icon="bootloader"><span class="label">Install m-bootloader</span><i class="led"></i></button>
+    </div>
+    <label class="port-row" id="port-row" hidden><span>Port</span> <select id="port-select"></select></label>
 
-  <section id="actions" hidden>
-    <h2>What to do</h2>
-    <div id="action-list"></div>
-    <input id="backup-file" type="file" accept=".bin" hidden>
-    <input id="firmware-file" type="file" accept=".fwsc" hidden>
-  </section>
+    <p class="notice" id="notice"><span class="notice-icon" data-icon="check-attention"></span><b id="notice-name"></b> <span id="notice-text"></span></p>
+    <p class="status" id="status" role="status"></p>
 
-  <section id="progress" hidden aria-live="polite">
-    <h2 id="progress-title"></h2>
-    <progress id="progress-bar" max="100" value="0"></progress>
-    <p id="progress-text"></p>
-    <p id="keep-open"><strong>Keep this tab in front, and don't unplug the unit.</strong></p>
-  </section>
+    <section class="block" id="device-info" hidden>
+      <h2 class="section-label">Device info</h2>
+      <dl class="info" id="info"></dl>
+    </section>
 
-  <p id="status" role="status"></p>
+    <section class="block" id="operations" hidden>
+      <h2 class="section-label">Operations</h2>
+      <div class="ops" id="ops">
+        <button type="button" class="op" id="op-backup" data-icon="backup"><span class="label">Save<br> backup</span><i class="led"></i></button>
+        <button type="button" class="op" id="op-restore" data-icon="restore"><span class="label">Restore<br> backup</span><i class="led"></i></button>
+        <button type="button" class="op" id="op-firmware" data-icon="firmware"><span class="label">Install<br> firmware</span><i class="led"></i></button>
+      </div>
+      <div class="more" id="more"></div>
+    </section>
 
-  <details>
-    <summary>What this page can and can't do</summary>
-    <ul>
-      <li><strong>On a unit running normal firmware:</strong> it starts a small helper program through the firmware's own update route. That writes a few KiB to the area firmware keeps for updates, then the unit runs the helper from RAM. When you finish, or after 5 minutes without this page asking anything, it goes back to its firmware.</li>
-      <li><strong>With m-bootloader:</strong> hold PLAY (SEQ PLAY on the SMK-37) at power-on, choose MIDI MODE, and press Check FM-1 status. That works with no firmware at all, and writes nothing until you ask.</li>
-      <li><strong>Backups</strong> are the whole flash, byte for byte, in the same format as the M-Flasher + app on a computer, and checked with a CRC the chip computes. Keep them safe.</li>
-      <li><strong>Restoring</strong> covers firmware, settings and presets. The bootloader and key area are never written from here, nor the SMK-37's calibration and Bluetooth data.</li>
-      <li><strong>You still need the M-Flasher + app on a computer</strong> for a unit that won't start and has no m-bootloader, for download mode, and to put the stock bootloader back. <a href="https://github.com/wellingtonsaam/m-flasher-plus">Get M-Flasher +</a>.</li>
-    </ul>
-  </details>
+    <section class="block" id="form" hidden>
+      <h2 class="section-label" id="form-label">Firmware file (.fwsc)</h2>
+      <div class="file-row">
+        <button type="button" class="btn" id="form-choose">Choose file</button>
+        <p class="field" id="form-field">No file chosen</p>
+      </div>
+      <button type="button" class="btn primary wide" id="form-go" disabled>Review</button>
+      <input id="backup-file" type="file" accept=".bin" hidden>
+      <input id="firmware-file" type="file" accept=".fwsc" hidden>
+    </section>
 
-  <details id="log-box">
-    <summary>Details</summary>
-    <pre id="log"></pre>
-  </details>
+    <div class="progress-log">
+      <section class="block">
+        <h2 class="section-label">Transfer progress</h2>
+        <ol class="steps" id="steps">
+          <li data-step="read">Read</li><li data-step="backup">Backup</li><li data-step="write">Write</li><li data-step="verify">Verify</li>
+        </ol>
+      </section>
+      <section class="block">
+        <h2 class="section-label">Operation log</h2>
+        <pre class="log" id="log"></pre>
+      </section>
+    </div>
+  </div>
+
+  <div class="col col-right">
+    <section class="block map-block" id="map-block">
+      <h2 class="section-label">Flash map · 1 MiB = 256 × 4 KiB</h2>
+      <div class="map" id="map" role="img" aria-label="Flash map"></div>
+      <ul class="legend" id="legend"></ul>
+      <p class="change-note" id="change-note">Nothing marked: choose a file to see what changes</p>
+    </section>
+
+    <section class="block" id="safety" hidden>
+      <div class="safety-head"><h2 class="section-label">Safety check</h2><span id="safety-count"></span></div>
+      <ul class="safety" id="safety-rows"></ul>
+    </section>
+  </div>
 </main>
 
-<dialog id="confirm">
+<details class="about-box">
+  <summary>What this page can and can't do</summary>
+  <ul>
+    <li><strong>On a unit running normal firmware:</strong> Check FM-1 status starts a small helper program through the firmware's own update route. That writes a few KiB to the area firmware keeps for updates, then the unit runs the helper from RAM. When you finish, or after 5 minutes without this page asking anything, it goes back to its firmware.</li>
+    <li><strong>With m-bootloader:</strong> hold PLAY (SEQ PLAY on the SMK-37) at power-on, choose MIDI MODE, and press Check FM-1 status. That works with no firmware at all, and writes nothing until you ask.</li>
+    <li><strong>Backups</strong> are the whole flash, byte for byte, in the same format as the M-Flasher + app on a computer, and checked with a CRC the chip computes. They go to your Downloads. Keep them safe.</li>
+    <li><strong>Restoring</strong> covers firmware, settings and presets. The bootloader and key area are never written from here, nor the SMK-37's calibration and Bluetooth data.</li>
+    <li><strong>You still need the M-Flasher + app on a computer</strong> for a unit that won't start and has no m-bootloader, for download mode, and to put the stock bootloader back. <a href="https://github.com/wellingtonsaam/m-flasher-plus">Get M-Flasher +</a>.</li>
+  </ul>
+</details>
+
+<nav class="bottom-nav" aria-label="Sections">
+  <button type="button" class="active" aria-current="page">Device</button>
+  <button type="button" id="about-tab-mobile">About</button>
+</nav>
+
+<dialog id="confirm" class="dialog">
   <form method="dialog">
-    <h2 id="confirm-title"></h2>
-    <pre id="confirm-text"></pre>
-    <ul id="confirm-warnings"></ul>
-    <label id="confirm-check-row"><input id="confirm-check" type="checkbox"> <span id="confirm-check-text"></span></label>
-    <menu>
-      <button id="confirm-cancel" value="cancel" type="submit">Cancel</button>
-      <button id="confirm-ok" value="ok" type="submit" class="danger"></button>
+    <h2 class="dialog-title" id="confirm-title"></h2>
+    <p class="dialog-lcd" id="confirm-plan" hidden></p>
+    <pre class="dialog-body" id="confirm-text"></pre>
+    <ul class="dialog-warnings" id="confirm-warnings"></ul>
+    <label class="dialog-check" id="confirm-check-row"><input id="confirm-check" type="checkbox"> <span id="confirm-check-text"></span></label>
+    <menu class="keys">
+      <button class="btn" id="confirm-cancel" value="cancel" type="submit">Cancel</button>
+      <button class="btn primary" id="confirm-ok" value="ok" type="submit"></button>
     </menu>
+  </form>
+</dialog>
+
+<dialog id="message" class="dialog">
+  <form method="dialog">
+    <h2 class="dialog-title" id="message-title"></h2>
+    <pre class="dialog-body" id="message-text"></pre>
+    <menu class="keys"><button class="btn" value="ok" type="submit" id="message-ok">Close</button></menu>
   </form>
 </dialog>
 <script type="module" src="app.js"></script>
