@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>M-Flasher + for the web</title>
+<title>FirmWave for the web</title>
 <meta name="description" content="Back up, restore and install firmware on an M-VAVE FM-1 or SMK-37 from your browser, over USB MIDI.">
 <meta name="theme-color" content="#28221f">
 <link rel="icon" href="assets/icon-256.png">
@@ -14,7 +14,7 @@
 </head>
 <body>
 <header class="top">
-  <h1 class="wordmark">M-Flasher +</h1>
+  <h1 class="wordmark">FirmWave</h1>
   <p class="subtitle"><span>USB MIDI firmware utility</span><span>in the browser · experimental beta</span></p>
   <p class="unit-line" id="unit-line"><span id="unit-line-text">No unit</span><i class="led" id="unit-led"></i></p>
   <nav class="tabs" aria-label="Sections">
@@ -107,9 +107,9 @@
   <ul>
     <li><strong>On a unit running normal firmware:</strong> Check FM-1 status starts a small helper program through the firmware's own update route. That writes a few KiB to the area firmware keeps for updates, then the unit runs the helper from RAM. When you finish, or after 5 minutes without this page asking anything, it goes back to its firmware.</li>
     <li><strong>With m-bootloader:</strong> hold PLAY (SEQ PLAY on the SMK-37) at power-on, choose MIDI MODE, and press Check FM-1 status. That works with no firmware at all, and writes nothing until you ask.</li>
-    <li><strong>Backups</strong> are the whole flash, byte for byte, in the same format as the M-Flasher + app on a computer, and checked with a CRC the chip computes. They go to your Downloads. Keep them safe.</li>
+    <li><strong>Backups</strong> are the whole flash, byte for byte, in the same format as the FirmWave app on a computer, and checked with a CRC the chip computes. They go to your Downloads. Keep them safe.</li>
     <li><strong>Restoring</strong> covers firmware, settings and presets. The bootloader and key area are never written from here, nor the SMK-37's calibration and Bluetooth data.</li>
-    <li><strong>You still need the M-Flasher + app on a computer</strong> for a unit that won't start and has no m-bootloader, for download mode, and to put the stock bootloader back. <a href="https://github.com/wellingtonsaam/m-flasher-plus">Get M-Flasher +</a>.</li>
+    <li><strong>You still need the FirmWave app on a computer</strong> for a unit that won't start and has no m-bootloader, for download mode, and to put the stock bootloader back. <a href="https://github.com/wellingtonsaam/firmwave-mflasher-plus">Get FirmWave</a>.</li>
   </ul>
 </details>
 
