@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 // The page: finds a unit, says what it is, and offers what can be done with it. It is drawn like the
-// Device tab of M-Flasher + (Figma: "Device · M-Flasher + web", and its phone version).
+// Device tab of FirmWave (Figma: "Device · FirmWave web", and its phone version).
 import { BOOT_AREA, crc32, hex, packageImage, rangesText, sha256Hex } from "./lib/formats.js";
 import { FINISH, Link, Unit, UnitLost, findPorts } from "./lib/protocol.js";
 import { CHIP_KEY, FM1, analyse, describePlan, flashTested, flashText, planFirmware, planRestore } from "./lib/unit.js";
 import { loadManifest, loadPackage, hasOwnUpdater, variantOf } from "./lib/assets.js";
 import { REGIONS, regionRanges, sectorMap } from "./lib/sectormap.js";
 
-const TOOL = "m-flasher-plus web 0.1";
+const TOOL = "firmwave web 0.1";
 /** Firmware whose update route has run the helper on real hardware. */
 const ROUTE_TESTED = new Set(["FM-1_015", "FM-1_016", "FM-1_102", "FM-1_918", "FM-1_900", "FM-1_920", "FM-1_91061", "SMK-37 Pro_016", "SMK-37+VA_102", "SMK-37 Pro_920", "SMK-37 Elite_016"]);
-const OTHER_WAYS = "With m-bootloader installed, hold PLAY (SEQ PLAY on the SMK-37) at power-on and choose MIDI MODE. Otherwise, use the M-Flasher + app on a computer.";
+const OTHER_WAYS = "With m-bootloader installed, hold PLAY (SEQ PLAY on the SMK-37) at power-on and choose MIDI MODE. Otherwise, use the FirmWave app on a computer.";
 const CHECK = "Check FM-1 status";
 const $ = (id) => document.getElementById(id);
 
@@ -345,7 +345,7 @@ async function startTools() {
       setStep("read", null);
       log("This firmware didn't accept the helper, and it keeps running.");
       message("The firmware didn't take the helper",
-        `This firmware only updates from its own kind of package, so the browser can't read your FM-1 through it. Nothing was written: your firmware and settings are unchanged.\n\nOther ways:\n1 · With m-bootloader: hold PLAY while switching the unit on, choose MIDI MODE, then press ${CHECK} again.\n2 · Or use the M-Flasher + app on a computer, in download mode.`);
+        `This firmware only updates from its own kind of package, so the browser can't read your FM-1 through it. Nothing was written: your firmware and settings are unchanged.\n\nOther ways:\n1 · With m-bootloader: hold PLAY while switching the unit on, choose MIDI MODE, then press ${CHECK} again.\n2 · Or use the FirmWave app on a computer, in download mode.`);
       return;
     }
     progress("Starting…", 1, 1, "The unit is restarting");
@@ -368,7 +368,7 @@ async function installBootloader() {
   const ok = await confirmWrite({
     title: `Install m-bootloader ${manifest.bootloaderVersion}?`,
     plan: `m-bootloader ${manifest.bootloaderVersion} · 4 sectors (16 KiB) · 0x00000-0x03FFF`,
-    text: "Installs the open bootloader, through the firmware's update route. Only the boot area changes; the firmware and your settings stay. It adds hold-REC download mode, a recovery menu and MIDI mode. The M-Flasher + app on a computer can put the stock bootloader back."
+    text: "Installs the open bootloader, through the firmware's update route. Only the boot area changes; the firmware and your settings stay. It adds hold-REC download mode, a recovery menu and MIDI mode. The FirmWave app on a computer can put the stock bootloader back."
       + (fromTools ? "\n\nThe unit first goes back to its firmware, which takes the package." : ""),
     warnings: [
       state.backupSaved ? null : `You haven't saved a backup in this session. Press ${CHECK} and SAVE first to make one.`,
@@ -418,7 +418,7 @@ async function applyPlan(plan) {
     return;
   }
   const warnings = [...plan.warnings];
-  if (state.info.kind === "stage" && state.analysis.bootloaderKind !== "open") warnings.push("This unit has the stock bootloader, so it has no hold-REC or MIDI mode. If this write is interrupted, it may need the M-Flasher + app in download mode or a USB_KEY dongle.");
+  if (state.info.kind === "stage" && state.analysis.bootloaderKind !== "open") warnings.push("This unit has the stock bootloader, so it has no hold-REC or MIDI mode. If this write is interrupted, it may need the FirmWave app in download mode or a USB_KEY dongle.");
   const ok = await confirmWrite({
     title: `${plan.title}?`,
     plan: `${plan.title} · ${plan.sectors.length} sectors`,
@@ -622,12 +622,12 @@ function renderNotice() {
   let notice = null;
   const a = state.analysis;
   if (!state.supported) notice = ["MIDI Browser", "Safari doesn't support Web MIDI, so it can't reach the unit. Download the MIDI Browser app and open this page there: it installs m-bootloader and firmware without problems. On a computer or Android, Chrome, Edge, Brave and Firefox work too."];
-  else if (state.mode === "none" && state.access) notice = ["Not found", `Switch the FM-1 off. Hold PLAY (SEQ PLAY on the SMK-37) while switching it on, choose MIDI MODE in the menu, then press ${CHECK}. That needs m-bootloader. Without it, switch the unit on normally, so its firmware shows up on USB MIDI. If the M-Flasher + app just checked it, it's still in download mode, which a browser can't see: switch it off and on first. Use a USB data cable, and close other MIDI apps.`];
-  else if (state.mode === "none") notice = ["Beta", "Experimental: save a backup first, and keep the M-Flasher + app at hand"];
-  else if (hasOwnUpdater(state.identity)) notice = ["Other ways", `This firmware only updates from its own kind of package, so the browser can't read it. Your firmware is unchanged. Use the M-Flasher + app on a computer, or m-bootloader 2.2's MIDI MODE (hold SEQ PLAY at power-on).${state.mode === "loader" ? " It's in its updater now: to leave, switch it off and on." : ""}`];
+  else if (state.mode === "none" && state.access) notice = ["Not found", `Switch the FM-1 off. Hold PLAY (SEQ PLAY on the SMK-37) while switching it on, choose MIDI MODE in the menu, then press ${CHECK}. That needs m-bootloader. Without it, switch the unit on normally, so its firmware shows up on USB MIDI. If the FirmWave app just checked it, it's still in download mode, which a browser can't see: switch it off and on first. Use a USB data cable, and close other MIDI apps.`];
+  else if (state.mode === "none") notice = ["Beta", "Experimental: save a backup first, and keep the FirmWave app at hand"];
+  else if (hasOwnUpdater(state.identity)) notice = ["Other ways", `This firmware only updates from its own kind of package, so the browser can't read it. Your firmware is unchanged. Use the FirmWave app on a computer, or m-bootloader 2.2's MIDI MODE (hold SEQ PLAY at power-on).${state.mode === "loader" ? " It's in its updater now: to leave, switch it off and on." : ""}`];
   else if (state.mode === "firmware") notice = ["Firmware route", `A browser can't read the flash through firmware: ${CHECK} starts the tools, which run from RAM. Your firmware stays.`];
   else if (state.mode === "loader") notice = ["Updater", "This can install firmware, but it can't read the flash, so no backup is possible here."];
-  else if (a && !a.board) notice = ["Model", "The model is uncertain, so this page won't write anything to this unit. To choose it, use the M-Flasher + app on a computer."];
+  else if (a && !a.board) notice = ["Model", "The model is uncertain, so this page won't write anything to this unit. To choose it, use the FirmWave app on a computer."];
   else if (a && a.bootloaderKind !== "open") notice = ["Safety check", "You don't have m-bootloader · install it here: only the boot area changes"];
   $("notice").hidden = !notice;
   if (notice) {
@@ -675,7 +675,7 @@ function renderOperations() {
   const canWrite = read && Boolean(state.analysis?.board);
   const more = [];
   if (state.mode === "stage" || state.mode === "bootloader") more.push(smallButton("Restart", "Leaves this mode, and starts the firmware.", () => leave("restart", "Restarting.")));
-  if (state.mode !== "none") more.push(smallButton("Download mode", "For the M-Flasher + app on a computer. A browser can't use this mode.", () => leave("downloadMode", "Asked for download mode. Open the M-Flasher + app on a computer.")));
+  if (state.mode !== "none") more.push(smallButton("Download mode", "For the FirmWave app on a computer. A browser can't use this mode.", () => leave("downloadMode", "Asked for download mode. Open the FirmWave app on a computer.")));
   $("more").replaceChildren(...more);
   // Before a read there are no operations, only the way to the computer app.
   $("operations").hidden = !(read || loader || more.length);
@@ -835,8 +835,8 @@ for (const el of document.querySelectorAll("[data-icon]")) {
   if (el.classList.contains("op")) el.insertAdjacentHTML("afterbegin", `<span class="icon">${svg}</span>`);
   else el.innerHTML = svg;
 }
-const about = () => message("M-Flasher + web beta",
-  "Back up, restore and install the firmware of the M-VAVE FM-1 and SMK-37 from the browser, over USB MIDI, and install m-bootloader. Nothing leaves your device.\n\nM-Flasher + by Wellington Saam. Based on M-Flasher by Julius Vitkauskas (MIT).\nUnofficial: not affiliated with M-VAVE or JieLi.");
+const about = () => message("FirmWave web beta",
+  "Back up, restore and install the firmware of the M-VAVE FM-1 and SMK-37 from the browser, over USB MIDI, and install m-bootloader. Nothing leaves your device.\n\nFirmWave by Wellington Saam. Based on M-Flasher by Julius Vitkauskas (MIT).\nUnofficial: not affiliated with M-VAVE or JieLi.");
 $("about-tab").onclick = about;
 $("about-tab-mobile").onclick = about;
 $("port-select").onchange = async () => {
@@ -847,7 +847,7 @@ $("port-select").onchange = async () => {
 document.addEventListener("visibilitychange", () => {
   if (document.hidden && state.busy) log("This tab went to the background: browsers slow it down, so an update may take far longer. Bring it back.");
 });
-log(state.supported ? "M-Flasher + (web beta) · Web MIDI OK" : "This browser has no Web MIDI: nothing can reach the unit");
+log(state.supported ? "FirmWave (web beta) · Web MIDI OK" : "This browser has no Web MIDI: nothing can reach the unit");
 render();
 // For checking the design without a unit: a script that sets this hook before loading app.js gets the page's state.
 window.__MFLASHER_PREVIEW__?.({ state, render, progress, setStep });

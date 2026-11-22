@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT */
-/* Tokens: the Figma variables of "M-Flasher Plus Library" (Color/…, Spacing/…), same names. */
+/* Tokens: the Figma variables of "FirmWave Library" (Color/…, Spacing/…), same names. */
 :root {
   color-scheme: dark;
   --bg-app: #28221f; --bg-panel: #221d1a; --bg-raised: #312a26; --bg-field: #1d1917; --bg-bezel: #141110;
